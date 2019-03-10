@@ -27,10 +27,6 @@ void swapLeftAndRightPoints(int &x0, int &y0, int &x1, int &y1) {
   std::swap(y0, y1);
 }
 
-float slope(int dy, int dx) {
-  return std::abs(dy/(float)dx);
-}
-
 void line(int x0, int y0, int x1, int y1, TGAImage &image, TGAColor color) {
   bool transposed = false;
   if (isSteep(x0, y0, x1, y1)) {
@@ -40,8 +36,9 @@ void line(int x0, int y0, int x1, int y1, TGAImage &image, TGAColor color) {
   if (isRightToLeft(x0, x1)) swapLeftAndRightPoints(x0, y0, x1, y1);
   int dx = x1 - x0;
   int dy = y1 - y0;
-  float derror = slope(dy, dx);
-  float error = 0;
+  int doubleHorizontalLength = 2 * dx;
+  int derror = std::abs(dy) * 2;
+  int error = 0;
   int y = y0;
   for (int x = x0; x <= x1; ++x) {
     if (transposed) {
@@ -50,9 +47,9 @@ void line(int x0, int y0, int x1, int y1, TGAImage &image, TGAColor color) {
       image.set(x, y, color);
     }
     error += derror;
-    if (error > 0.5) {
+    if (error > dx) {
       y += (isRising(y0, y1) ? 1 : -1);
-      error -= 1;
+      error -= doubleHorizontalLength;
     }
   }
 }
