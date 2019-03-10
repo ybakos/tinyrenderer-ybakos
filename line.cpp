@@ -50,3 +50,24 @@ void line(int x0, int y0, int x1, int y1, TGAImage &image, TGAColor color) {
     }
   }
 }
+
+void line(Vec2i p0, Vec2i p1, TGAImage &image, TGAColor color) {
+  bool transposed = false;
+  if (isSteep(p0.x, p0.y, p1.x, p1.y)) {
+    std::swap(p0.x, p0.y);
+    std::swap(p1.x, p1.y);
+    transposed = true;
+  }
+  if (isRightToLeft(p0.x, p1.x)) {
+    std::swap(p0, p1);
+  }
+  for (int x = p0.x; x <= p1.x; ++x) {
+    float t = (x - p0.x) / (float)(p1.x - p0.x);
+    int y = p0.y * (1.0 - t) + p1.y * t;
+    if (transposed) {
+      image.set(y, x, color);
+    } else {
+      image.set(x, y, color);
+    }
+  }
+}

@@ -1,40 +1,35 @@
 #include <vector>
 #include <cmath>
 #include "tgaimage.h"
-#include "model.h"
 #include "geometry.h"
 #include "line.h"
 
-const int WIDTH = 800;
-const int HEIGHT = 800;
+const int WIDTH = 200;
+const int HEIGHT = 200;
 const char* DEFAULT_OBJ_FILENAME = "obj/african_head.obj";
 const char* IMAGE_OUTPUT_FILENAME = "output.tga";
 const TGAColor WHITE = TGAColor(255, 255, 255, 255);
 const TGAColor RED = TGAColor(255, 0, 0, 255);
+const TGAColor GREEN = TGAColor(0, 255, 0, 255);
 
-Model* model;
+void triangle(Vec2i p0, Vec2i p1, Vec2i p2, TGAImage &image, TGAColor color) {
+  line(p0, p1, image, color);
+  line(p1, p2, image, color);
+  line(p2, p0, image, color);
+}
 
 int main(int argc, char* argv[]) {
-  if (argc == 2) {
-    model = new Model(argv[1]);
-  } else {
-    model = new Model(DEFAULT_OBJ_FILENAME);
-  }
   TGAImage image(WIDTH, HEIGHT, TGAImage::RGB);
-  for (int i = 0; i < model->nfaces(); ++i) {
-    std::vector<int> face = model->face(i);
-    for (int j = 0; j < 3; ++j) {
-      Vec3f v0 = model->vert(face[j]);
-      Vec3f v1 = model->vert(face[(j+1)%3]);
-      int x0 = (v0.x + 1) * WIDTH/2;
-      int y0 = (v0.y + 1) * HEIGHT/2;
-      int x1 = (v1.x + 1) * WIDTH/2;
-      int y1 = (v1.y + 1) * HEIGHT/2;
-      line(x0, y0, x1, y1, image, WHITE);
-    }
-  }
+
+  Vec2i triangle0[3] = { Vec2i(10, 70), Vec2i(50, 160), Vec2i(70, 80) };
+  Vec2i triangle1[3] = { Vec2i(180, 50), Vec2i(150, 1), Vec2i(70, 180) };
+  Vec2i triangle2[3] = { Vec2i(180, 150), Vec2i(120, 160), Vec2i(130, 180) };
+
+  triangle(triangle0[0], triangle0[1], triangle0[2], image, RED);
+  triangle(triangle1[0], triangle1[1], triangle1[2], image, WHITE);
+  triangle(triangle2[0], triangle2[1], triangle2[2], image, GREEN);
+
   image.flip_vertically();
   image.write_tga_file(IMAGE_OUTPUT_FILENAME);
-  delete model;
   return 0;
 }
