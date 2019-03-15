@@ -20,9 +20,17 @@ void sortVerticesLowToHigh(Vec2i &p0, Vec2i &p1, Vec2i &p2) {
 
 void triangle(Vec2i p0, Vec2i p1, Vec2i p2, TGAImage &image, TGAColor color) {
   sortVerticesLowToHigh(p0, p1, p2);
-  line(p0, p2, image, RED); // Boundary A (lowest point to highest)
-  line(p0, p1, image, GREEN); // Boundary B1 (lowest to second-highest)
-  line(p1, p2, image, GREEN); // Boundary B2 (second-highest to highest)
+  int boundaryAHeight = p2.y - p0.y;
+  int DIVIDE_BY_ZERO_HACK_WHEN_P0_AND_P1_HAVE_SAME_Y = 1;
+  int boundaryBFirstSegmentHeight = p1.y - p0.y + DIVIDE_BY_ZERO_HACK_WHEN_P0_AND_P1_HAVE_SAME_Y;
+  for (int y = p0.y; y <= p1.y; ++y) {
+    float tA = (y - p0.y) / (float)boundaryAHeight;
+    float tB = (y - p0.y) / (float)boundaryBFirstSegmentHeight;
+    Vec2i boundaryAp0ToY = p0 + (p2 - p0) * tA;
+    Vec2i boundaryBp0ToY = p0 + (p1 - p0) * tB;
+    image.set(boundaryAp0ToY.x, y, RED);
+    image.set(boundaryBp0ToY.x, y, GREEN);
+  }
 }
 
 int main(int argc, char* argv[]) {
