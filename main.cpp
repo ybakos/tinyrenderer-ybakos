@@ -28,6 +28,12 @@ void triangle(Vec2i p0, Vec2i p1, Vec2i p2, TGAImage &image, TGAColor color) {
     float tB = (y - p0.y) / (float)boundaryBFirstSegmentHeight;
     Vec2i boundaryAp0ToY = p0 + (p2 - p0) * tA;
     Vec2i boundaryBp0ToY = p0 + (p1 - p0) * tB;
+    if (boundaryAp0ToY.x > boundaryBp0ToY.x) {
+      std::swap(boundaryAp0ToY, boundaryBp0ToY);
+    }
+    for (int j = boundaryAp0ToY.x; j <= boundaryBp0ToY.x; ++j) {
+      image.set(j, y, WHITE);
+    }
     image.set(boundaryAp0ToY.x, y, RED);
     image.set(boundaryBp0ToY.x, y, GREEN);
   }
