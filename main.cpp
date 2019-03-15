@@ -32,10 +32,21 @@ void triangle(Vec2i p0, Vec2i p1, Vec2i p2, TGAImage &image, TGAColor color) {
       std::swap(boundaryAp0ToY, boundaryBp0ToY);
     }
     for (int j = boundaryAp0ToY.x; j <= boundaryBp0ToY.x; ++j) {
-      image.set(j, y, WHITE);
+      image.set(j, y, color);
     }
-    image.set(boundaryAp0ToY.x, y, RED);
-    image.set(boundaryBp0ToY.x, y, GREEN);
+  }
+int boundaryBSecondSegmentHeight = p2.y - p1.y + DIVIDE_BY_ZERO_HACK_WHEN_P0_AND_P1_HAVE_SAME_Y;
+  for (int y = p1.y; y <= p2.y; ++y) {
+    float tA = (y - p0.y) / (float)boundaryAHeight;
+    float tB = (y - p1.y) / (float)boundaryBSecondSegmentHeight;
+    Vec2i boundaryAp0ToY = p0 + (p2 - p0) * tA;
+    Vec2i boundaryBp1ToY = p1 + (p2 - p1) * tB;
+    if (boundaryAp0ToY.x > boundaryBp1ToY.x) {
+      std::swap(boundaryAp0ToY, boundaryBp1ToY);
+    }
+    for (int j = boundaryAp0ToY.x; j <= boundaryBp1ToY.x; ++j) {
+      image.set(j, y, color);
+    }
   }
 }
 
