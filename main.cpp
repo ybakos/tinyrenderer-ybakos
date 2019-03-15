@@ -12,10 +12,17 @@ const TGAColor WHITE = TGAColor(255, 255, 255, 255);
 const TGAColor RED = TGAColor(255, 0, 0, 255);
 const TGAColor GREEN = TGAColor(0, 255, 0, 255);
 
+void sortVerticesLowToHigh(Vec2i &p0, Vec2i &p1, Vec2i &p2) {
+  if (p0.y > p1.y) std::swap(p0, p1);
+  if (p0.y > p2.y) std::swap(p0, p2);
+  if (p1.y > p2.y) std::swap(p1, p2);
+}
+
 void triangle(Vec2i p0, Vec2i p1, Vec2i p2, TGAImage &image, TGAColor color) {
-  line(p0, p1, image, color);
-  line(p1, p2, image, color);
-  line(p2, p0, image, color);
+  sortVerticesLowToHigh(p0, p1, p2);
+  line(p0, p2, image, RED); // Boundary A (lowest point to highest)
+  line(p0, p1, image, GREEN); // Boundary B1 (lowest to second-highest)
+  line(p1, p2, image, GREEN); // Boundary B2 (second-highest to highest)
 }
 
 int main(int argc, char* argv[]) {
