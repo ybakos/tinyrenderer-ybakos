@@ -18,34 +18,26 @@ void sortVerticesLowToHigh(Vec2i &p0, Vec2i &p1, Vec2i &p2) {
   if (p1.y > p2.y) std::swap(p1, p2);
 }
 
+bool degenerateTriangle(Vec2i p0, Vec2i p1, Vec2i p2) {
+  return (p0.y == p1.y && p1.y == p2.y) || (p0.x == p1.x && p1.x == p2.x);
+}
+
 void triangle(Vec2i p0, Vec2i p1, Vec2i p2, TGAImage &image, TGAColor color) {
+  if (degenerateTriangle(p0, p1, p2)) return;
   sortVerticesLowToHigh(p0, p1, p2);
-  int boundaryAHeight = p2.y - p0.y;
-  int DIVIDE_BY_ZERO_HACK_WHEN_P0_AND_P1_HAVE_SAME_Y = 1;
-  int boundaryBFirstSegmentHeight = p1.y - p0.y + DIVIDE_BY_ZERO_HACK_WHEN_P0_AND_P1_HAVE_SAME_Y;
-  for (int y = p0.y; y <= p1.y; ++y) {
-    float tA = (y - p0.y) / (float)boundaryAHeight;
-    float tB = (y - p0.y) / (float)boundaryBFirstSegmentHeight;
+  int totalHeight = p2.y - p0.y;
+  for (int i = 0; i <= totalHeight; ++i) {
+    bool inSecondHalf = i > p1.y-p0.y || p1.y == p0.y;
+    int segmentHeight = inSecondHalf ? p2.y - p1.y : p1.y - p0.y;
+    float tA = i / (float)totalHeight;
+    float tB = (float)(i - (inSecondHalf ? p1.y - p0.y : 0)) / segmentHeight;
     Vec2i boundaryAp0ToY = p0 + (p2 - p0) * tA;
-    Vec2i boundaryBp0ToY = p0 + (p1 - p0) * tB;
+    Vec2i boundaryBp0ToY = inSecondHalf ? p1 + (p2 - p1) * tB : p0 + (p1 - p0) * tB;
     if (boundaryAp0ToY.x > boundaryBp0ToY.x) {
       std::swap(boundaryAp0ToY, boundaryBp0ToY);
     }
     for (int j = boundaryAp0ToY.x; j <= boundaryBp0ToY.x; ++j) {
-      image.set(j, y, color);
-    }
-  }
-int boundaryBSecondSegmentHeight = p2.y - p1.y + DIVIDE_BY_ZERO_HACK_WHEN_P0_AND_P1_HAVE_SAME_Y;
-  for (int y = p1.y; y <= p2.y; ++y) {
-    float tA = (y - p0.y) / (float)boundaryAHeight;
-    float tB = (y - p1.y) / (float)boundaryBSecondSegmentHeight;
-    Vec2i boundaryAp0ToY = p0 + (p2 - p0) * tA;
-    Vec2i boundaryBp1ToY = p1 + (p2 - p1) * tB;
-    if (boundaryAp0ToY.x > boundaryBp1ToY.x) {
-      std::swap(boundaryAp0ToY, boundaryBp1ToY);
-    }
-    for (int j = boundaryAp0ToY.x; j <= boundaryBp1ToY.x; ++j) {
-      image.set(j, y, color);
+      image.set(j, p0.y + i, color);
     }
   }
 }
